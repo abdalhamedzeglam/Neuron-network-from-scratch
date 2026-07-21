@@ -1,7 +1,7 @@
 import numpy as np
 from .losses import categorical_cross_entropy
 
-class ReLU():
+class ReLU:
     def forward(self , inputs):
         self.inputs = inputs
         self.output = np.maximum(0 , inputs)
@@ -10,7 +10,7 @@ class ReLU():
         self.dinputs = dvalues.copy()
         self.dinputs[self.inputs <= 0] = 0
 
-class Softmax():
+class Softmax:
     def forward(self , inputs):
         self.inputs = inputs
 
@@ -31,7 +31,7 @@ class Softmax():
             
             self.dinputs[index] = np.dot(jacobian_matrix , single_dvalues)
 
-class Softmax_CCE_loss():
+class Softmax_CCE_loss:
     def __init__(self):
         self.activation = Softmax()
         self.loss = categorical_cross_entropy()
