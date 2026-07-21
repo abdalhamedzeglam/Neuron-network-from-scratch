@@ -1,34 +1,40 @@
-import numpy as np
 import nnfs
 from nnfs.datasets import spiral_data
-from nn import layers
-from nn import activations
-from nn import losses
-from nn import metrics
+
+from nn import Layer_dense
+from nn import ReLU
+from nn import Softmax_CCE_loss
+from nn import Accuracy
 
 nnfs.init()
 
-x , y = spiral_data(100 , 3)
+x , y = spiral_data(samples=100 , classes=3)
 
-Layer1 = layers.Layer_Dence(2 , 3)
-activation_layer1 = activations.ReLU_Activation()
+dense1 = Layer_dense(2 , 3)
+relu = ReLU()
 
-Layer_ouput = layers.Layer_Dence(3 , 3)
-activation_output = activations.Softmax_Activation()
+dense2 = Layer_dense(3 , 3)
+loss_activation = Softmax_CCE_loss()
 
-Layer1.forward(x)
-activation_layer1.forward(Layer1.output)
+dense1.forward(x)
+relu.forward(dense1.output)
 
-Layer_ouput.forward(activation_layer1.output)
-activation_output.forward(Layer_ouput.output)
+dense2.forward(relu.output)
+loss = loss_activation.forward(dense2.output , y)
 
-print(activation_output.output[:5])
+accuracy_nn = Accuracy()
+accuracy = accuracy_nn.calculate(loss_activation.output , y)
 
-loss_function = losses.Loss_Categorical_cross_entropy()
-loss = loss_function.calculate_loss(activation_output.output , y)
+print(loss_activation.output[:5])
+print('loss' , loss)
+print('accuracy' , accuracy)
 
-metric = metrics.Accuracy()
-accuracy = metric.calculate(activation_output.output , y)
+loss_activation.backward(loss_activation.output , y)
+dense2.backward(loss_activation.dinputs)
+relu.backward(dense2.dinputs)
+dense1.backward(relu.dinputs)
 
-print('loss:' , loss)
-print('accuracy:' , accuracy , '%')
+print(dense1.dweights)
+print(dense1.dbiases)
+print(dense2.dweights)
+print(dense2.dbiases)
